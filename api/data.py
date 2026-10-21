@@ -21,7 +21,7 @@ DEFAULT_PRODUCTS = [
         "origin": "MADE IN JAPAN (TOKYO)",
         "descriptionEn": "Lightweight technical stand-collar track jacket crafted from matte-finished Taslan nylon. Wind-resistant and water-repellent shell paired with anti-static mesh interior.",
         "descriptionJp": "撥水加工を施したマットな質感のリサイクルタスランナイロンを使用したスタンドカラートラックジャケット。内側には帯電防止のメッシュライニングを配置。",
-        "primaryImage": "/src/assets/images/catalog_nylon_jacket_1792555601489.jpg",
+        "primaryImage": "/images/catalog_nylon_jacket_1792555601489.jpg",
         "status": "ARCHIVE",
         "measurements": [
             {"size": "S", "length": 68, "chest": 64, "shoulder": 54, "sleeve": 62},
@@ -55,7 +55,7 @@ DEFAULT_PRODUCTS = [
         "origin": "MADE IN JAPAN (WAKAYAMA / TOKYO)",
         "descriptionEn": "Knit slowly on vintage loopwheel machines in Wakayama. Exceptionally dense yet supple 14.5 oz cotton fleece that softens with age without losing its structural shape.",
         "descriptionJp": "和歌山県の旧式吊り編み機でゆっくりと時間をかけて編み立てた14.5オンスの極厚裏毛スウェット。脇に縫い目のない丸胴仕様。",
-        "primaryImage": "/src/assets/images/catalog_loopwheel_hoodie_1792555602331.jpg",
+        "primaryImage": "/images/catalog_loopwheel_hoodie_1792555602331.jpg",
         "status": "ARCHIVE",
         "measurements": [
             {"size": "S", "length": 67, "chest": 61, "shoulder": 53, "sleeve": 60},
@@ -87,7 +87,7 @@ DEFAULT_PRODUCTS = [
         "origin": "MADE IN JAPAN",
         "descriptionEn": "Classic Tokyo street proportion border stripe long sleeve tee. Woven from dry-touch open-end cotton yarn for an authentic vintage hand-feel.",
         "descriptionJp": "ドライな質感を持つ太番手オープンエンド糸で編み立てた、度詰めのヘビーウェイトボーダー長袖カットソー。",
-        "primaryImage": "/src/assets/images/catalog_border_tee_1792555602999.jpg",
+        "primaryImage": "/images/catalog_border_tee_1792555602999.jpg",
         "status": "ARCHIVE",
         "measurements": [
             {"size": "S", "length": 70, "chest": 60, "shoulder": 54, "sleeve": 59},
@@ -118,7 +118,7 @@ DEFAULT_PRODUCTS = [
         "origin": "MADE IN JAPAN (TOKYO)",
         "descriptionEn": "Matching easy pants for the Technical Nylon Track Jacket. Designed with a generous roomy thigh that tapers gently down to an elasticated cuff.",
         "descriptionJp": "トラックジャケットとセットアップ可能なイージートラックパンツ。渡り幅にゆとりを持たせ、裾口はゴムシャーリングとジップスリット仕様。",
-        "primaryImage": "/src/assets/images/catalog_nylon_pants_1792555625588.jpg",
+        "primaryImage": "/images/catalog_nylon_pants_1792555625588.jpg",
         "status": "ARCHIVE",
         "measurements": [
             {"size": "S", "length": 98, "chest": 0, "shoulder": 0, "sleeve": 0, "waist": 76, "inseam": 69},
@@ -149,7 +149,7 @@ DEFAULT_PRODUCTS = [
         "origin": "MADE IN JAPAN",
         "descriptionEn": "Structured crewneck sweatshirt featuring wide ribbed side gussets inspired by heritage athletic wear.",
         "descriptionJp": "身頃の縮みを防ぐ両脇リブパネル（サイドリブ）を採用したヘビーウェイトクルーネックスウェット。",
-        "primaryImage": "/src/assets/images/catalog_navy_crewneck_1792555626364.jpg",
+        "primaryImage": "/images/catalog_navy_crewneck_1792555626364.jpg",
         "status": "ARCHIVE",
         "measurements": [
             {"size": "S", "length": 66, "chest": 60, "shoulder": 52, "sleeve": 59},
@@ -180,7 +180,7 @@ DEFAULT_PRODUCTS = [
         "origin": "MADE IN JAPAN (NIIGATA / TOKYO)",
         "descriptionEn": "An elevated interpretation of the classic American button-down shirt tailored with Japanese precision.",
         "descriptionJp": "最高峰のギザコットンを使用したロイヤルオックスフォード生地のボタンダウンシャツ。",
-        "primaryImage": "/src/assets/images/catalog_oxford_shirt_1792555626446.jpg",
+        "primaryImage": "/images/catalog_oxford_shirt_1792555626446.jpg",
         "status": "ARCHIVE",
         "measurements": [
             {"size": "S", "length": 78, "chest": 65, "shoulder": 53, "sleeve": 59},
@@ -211,7 +211,7 @@ DEFAULT_PRODUCTS = [
         "origin": "MADE IN JAPAN (OKAYAMA / TOKYO)",
         "descriptionEn": "Indestructible daily tote crafted from authentic Kurashiki cotton canvas woven in Okayama prefecture.",
         "descriptionJp": "岡山県倉敷市で織られた伝統的な6号帆布を使用したタフなデイリートートバッグ。",
-        "primaryImage": "/src/assets/images/catalog_canvas_tote_1792555626362.jpg",
+        "primaryImage": "/images/catalog_canvas_tote_1792555626362.jpg",
         "status": "ARCHIVE",
         "measurements": [
             {"size": "S", "length": 42, "chest": 46, "shoulder": 14, "sleeve": 84}
@@ -238,7 +238,7 @@ DEFAULT_PRODUCTS = [
         "origin": "MADE IN JAPAN (NARA / TOKYO)",
         "descriptionEn": "Curated essentials pack containing an unconstructed 6-panel dad cap in bio-washed chino twill and a pair of heavyweight cushioned athletic crew socks.",
         "descriptionJp": "バイオウォッシュを施したチノツイル製のアンコン6パネルキャップと、靴下の産地・奈良県で編み立てたパイル編みリブソックスの特別セット。",
-        "primaryImage": "/src/assets/images/catalog_caps_and_socks_1792555602987.jpg",
+        "primaryImage": "/images/catalog_caps_and_socks_1792555602987.jpg",
         "status": "ARCHIVE",
         "measurements": [
             {"size": "S", "length": 13, "chest": 58, "shoulder": 7, "sleeve": 0}

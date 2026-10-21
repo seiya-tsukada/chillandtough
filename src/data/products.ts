@@ -20,7 +20,7 @@ export const PRODUCTS: Product[] = [
     origin: 'MADE IN JAPAN (TOKYO)',
     descriptionEn: 'Lightweight technical stand-collar track jacket crafted from matte-finished Taslan nylon. Wind-resistant and water-repellent shell paired with anti-static mesh interior. Minimalist left-chest embroidery and custom matte black YKK dual-slider zipper.',
     descriptionJp: '撥水加工を施したマットな質感のリサイクルタスランナイロンを使用したスタンドカラートラックジャケット。内側には帯電防止のメッシュライニングを配置。左胸にミニマルな同色系ロゴ刺繍、ダブルジップ仕様。',
-    primaryImage: '/src/assets/images/catalog_nylon_jacket_1792555601489.jpg',
+    primaryImage: '/images/catalog_nylon_jacket_1792555601489.jpg',
     status: 'ARCHIVE',
     measurements: [
       { size: 'S', length: 68, chest: 64, shoulder: 54, sleeve: 62 },
@@ -55,7 +55,7 @@ export const PRODUCTS: Product[] = [
     origin: 'MADE IN JAPAN (WAKAYAMA / TOKYO)',
     descriptionEn: 'Knit slowly on vintage loopwheel machines in Wakayama. Exceptionally dense yet supple 14.5 oz cotton fleece that softens with age without losing its structural shape. Seamless side body, double-layer structured hood with no drawstrings, and micro tonal chest embroidery.',
     descriptionJp: '和歌山県の旧式吊り編み機でゆっくりと時間をかけて編み立てた14.5オンスの極厚裏毛スウェット。脇に縫い目のない丸胴仕様と、立ち上がりの良い2枚仕立てのフード。胸元には控えめな刺繍を配置。',
-    primaryImage: '/src/assets/images/catalog_loopwheel_hoodie_1792555602331.jpg',
+    primaryImage: '/images/catalog_loopwheel_hoodie_1792555602331.jpg',
     status: 'ARCHIVE',
     measurements: [
       { size: 'S', length: 67, chest: 61, shoulder: 53, sleeve: 60 },
@@ -90,7 +90,7 @@ export const PRODUCTS: Product[] = [
     origin: 'MADE IN JAPAN',
     descriptionEn: 'Classic Tokyo street proportion border stripe long sleeve tee. Woven from dry-touch open-end cotton yarn for an authentic vintage hand-feel. Ribbed binder neckline and heavy ribbed cuffs designed for layering or standalone wear.',
     descriptionJp: 'ドライな質感を持つ太番手オープンエンド糸で編み立てた、度詰めのヘビーウェイトボーダー長袖カットソー。バインダー仕様のリブ襟としっかりとした袖リブにより、型崩れを防ぎ長く愛用できます。',
-    primaryImage: '/src/assets/images/catalog_border_tee_1792555602999.jpg',
+    primaryImage: '/images/catalog_border_tee_1792555602999.jpg',
     status: 'ARCHIVE',
     measurements: [
       { size: 'S', length: 70, chest: 60, shoulder: 54, sleeve: 59 },
@@ -125,7 +125,7 @@ export const PRODUCTS: Product[] = [
     origin: 'MADE IN JAPAN (TOKYO)',
     descriptionEn: 'Matching easy pants for the Technical Nylon Track Jacket. Designed with a generous roomy thigh that tapers gently down to an elasticated cuff with an ankle zip. Features an elastic waistband with internal drawstring and concealed zip welt pockets.',
     descriptionJp: 'トラックジャケットとセットアップ可能なイージートラックパンツ。渡り幅にゆとりを持たせ、裾にかけて緩やかにテーパードするリラックスシルエット。裾口はゴムシャーリングとジップスリット仕様。',
-    primaryImage: '/src/assets/images/catalog_nylon_pants_1792555625588.jpg',
+    primaryImage: '/images/catalog_nylon_pants_1792555625588.jpg',
     status: 'ARCHIVE',
     measurements: [
       { size: 'S', length: 98, chest: 0, shoulder: 0, sleeve: 0, waist: 76, inseam: 69 },
@@ -160,7 +160,7 @@ export const PRODUCTS: Product[] = [
     origin: 'MADE IN JAPAN',
     descriptionEn: 'Structured crewneck sweatshirt featuring wide ribbed side gussets inspired by heritage athletic wear. Produced with ultra-dense Japanese cotton for a firm drape that maintains its clean boxy volume. Subtle typographic chest print.',
     descriptionJp: '身頃の縮みを防ぐ両脇リブパネル（サイドリブ）を採用したヘビーウェイトクルーネックスウェット。14オンスの目の詰まった裏毛生地を使用し、着用時も綺麗なボックスシルエットを保ちます。',
-    primaryImage: '/src/assets/images/catalog_navy_crewneck_1792555626364.jpg',
+    primaryImage: '/images/catalog_navy_crewneck_1792555626364.jpg',
     status: 'ARCHIVE',
     measurements: [
       { size: 'S', length: 66, chest: 60, shoulder: 52, sleeve: 59 },
@@ -195,7 +195,7 @@ export const PRODUCTS: Product[] = [
     origin: 'MADE IN JAPAN (NIIGATA / TOKYO)',
     descriptionEn: 'An elevated interpretation of the classic American button-down shirt tailored with Japanese precision. Cut generously with an easy flowing drape, deep box pleat, curved hem, and genuine mother-of-pearl buttons.',
     descriptionJp: '最高峰のギザコットンを使用したロイヤルオックスフォード生地のボタンダウンシャツ。肩と身幅にたっぷりとゆとりを持たせながら、襟元の美しいロールにこだわった仕立て。本白蝶貝ボタン使用。',
-    primaryImage: '/src/assets/images/catalog_oxford_shirt_1792555626446.jpg',
+    primaryImage: '/images/catalog_oxford_shirt_1792555626446.jpg',
     status: 'ARCHIVE',
     measurements: [
       { size: 'S', length: 78, chest: 65, shoulder: 53, sleeve: 59 },
@@ -229,7 +229,7 @@ export const PRODUCTS: Product[] = [
     origin: 'MADE IN JAPAN (OKAYAMA / TOKYO)',
     descriptionEn: 'Indestructible daily tote crafted from authentic Kurashiki cotton canvas woven in Okayama prefecture. Features dual short hand straps and comfortable wide shoulder strap for cross-body carry. Clean typography silkscreened on front.',
     descriptionJp: '岡山県倉敷市で織られた伝統的な6号帆布を使用したタフなデイリートートバッグ。手持ち用ハンドルと肩掛け用ショルダーストラップの2WAY仕様。毎日ラフに使える頑丈な設計です。',
-    primaryImage: '/src/assets/images/catalog_canvas_tote_1792555626362.jpg',
+    primaryImage: '/images/catalog_canvas_tote_1792555626362.jpg',
     status: 'ARCHIVE',
     measurements: [
       { size: 'S', length: 42, chest: 46, shoulder: 14, sleeve: 84 },
@@ -261,7 +261,7 @@ export const PRODUCTS: Product[] = [
     origin: 'MADE IN JAPAN (NARA / TOKYO)',
     descriptionEn: 'Curated essentials pack containing an unconstructed 6-panel dad cap in bio-washed chino twill and a pair of heavyweight cushioned athletic crew socks knitted in Nara prefecture. Subtle tonal embroidery.',
     descriptionJp: 'バイオウォッシュを施したチノツイル製のアンコン6パネルキャップと、靴下の産地・奈良県で編み立てたパイル編みリブソックスの特別セット。日常に溶け込む上質なデイリーギア。',
-    primaryImage: '/src/assets/images/catalog_caps_and_socks_1792555602987.jpg',
+    primaryImage: '/images/catalog_caps_and_socks_1792555602987.jpg',
     status: 'ARCHIVE',
     measurements: [
       { size: 'S', length: 13, chest: 58, shoulder: 7, sleeve: 0 },

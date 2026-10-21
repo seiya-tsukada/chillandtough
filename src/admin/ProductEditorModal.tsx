@@ -10,14 +10,14 @@ interface ProductEditorModalProps {
 }
 
 const SAMPLE_IMAGES = [
-  { label: 'Nylon Track Jacket (Black)', url: '/src/assets/images/catalog_nylon_jacket_1792555601489.jpg' },
-  { label: 'Loopwheel Hoodie (Ash)', url: '/src/assets/images/catalog_loopwheel_hoodie_1792555602331.jpg' },
-  { label: 'Border Stripe L/S Tee', url: '/src/assets/images/catalog_border_tee_1792555602999.jpg' },
-  { label: 'Nylon Easy Pants (Black)', url: '/src/assets/images/catalog_nylon_pants_1792555625588.jpg' },
-  { label: 'Crewneck Sweatshirt (Navy)', url: '/src/assets/images/catalog_navy_crewneck_1792555626364.jpg' },
-  { label: 'Oxford B.D. Shirt (White)', url: '/src/assets/images/catalog_oxford_shirt_1792555626446.jpg' },
-  { label: 'Heavy Canvas Tote (Ecru)', url: '/src/assets/images/catalog_canvas_tote_1792555626362.jpg' },
-  { label: 'Cap & Socks Set', url: '/src/assets/images/catalog_caps_and_socks_1792555602987.jpg' },
+  { label: 'Nylon Track Jacket (Black)', url: '/images/catalog_nylon_jacket_1792555601489.jpg' },
+  { label: 'Loopwheel Hoodie (Ash)', url: '/images/catalog_loopwheel_hoodie_1792555602331.jpg' },
+  { label: 'Border Stripe L/S Tee', url: '/images/catalog_border_tee_1792555602999.jpg' },
+  { label: 'Nylon Easy Pants (Black)', url: '/images/catalog_nylon_pants_1792555625588.jpg' },
+  { label: 'Crewneck Sweatshirt (Navy)', url: '/images/catalog_navy_crewneck_1792555626364.jpg' },
+  { label: 'Oxford B.D. Shirt (White)', url: '/images/catalog_oxford_shirt_1792555626446.jpg' },
+  { label: 'Heavy Canvas Tote (Ecru)', url: '/images/catalog_canvas_tote_1792555626362.jpg' },
+  { label: 'Cap & Socks Set', url: '/images/catalog_caps_and_socks_1792555602987.jpg' },
 ];
 
 export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
