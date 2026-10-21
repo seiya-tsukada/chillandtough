@@ -118,7 +118,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigatePublic
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `archive_tokyo_catalog_${Date.now()}.json`;
+    a.download = `chillandtough_catalog_${Date.now()}.json`;
     a.click();
     showNotice('Exported catalog JSON file');
   };

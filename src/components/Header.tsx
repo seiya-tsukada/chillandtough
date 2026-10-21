@@ -27,7 +27,7 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={() => setCurrentTab('CATALOG')}
           className="text-lg md:text-xl font-bold tracking-tight text-neutral-950 whitespace-nowrap shrink-0 text-left hover:opacity-70 transition-opacity"
         >
-          ARCHIVE TOKYO
+          chillandtough
         </button>
 
         {/* Zone 2: 4 clean single-line text navigation links */}

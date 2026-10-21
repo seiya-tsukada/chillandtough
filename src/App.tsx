@@ -308,7 +308,7 @@ export default function App() {
       <footer className="border-t border-neutral-200 bg-white/70 mt-16 px-4 md:px-8 py-8 text-neutral-500 text-xs font-mono-nums">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <span className="font-semibold text-neutral-900 font-sans">ARCHIVE TOKYO</span>
+            <span className="font-semibold text-neutral-900 font-sans">chillandtough</span>
             <span aria-hidden="true">·</span>
             <span>INDEPENDENT PRODUCT CATALOG</span>
             <span aria-hidden="true">·</span>
@@ -316,7 +316,7 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-6">
-            <span>© 2026 ARCHIVE TOKYO</span>
+            <span>© 2026 chillandtough</span>
             <span aria-hidden="true">·</span>
             <button
               onClick={navigateToAdmin}

@@ -9,10 +9,10 @@ export const InfoView: React.FC = () => {
           DOCUMENTATION · ARCHIVE ARCHITECTURE
         </span>
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-neutral-950 font-sans">
-          ARCHIVE TOKYO
+          chillandtough
         </h1>
         <p className="text-sm md:text-base text-neutral-700 leading-relaxed font-sans">
-          ARCHIVE TOKYO is an unadorned, non-commercial catalog and permanent digital archive documenting limited apparel and everyday functional garments crafted in Tokyo and across specialized manufacturing regions in Japan.
+          chillandtough is an unadorned, non-commercial catalog and permanent digital archive documenting limited apparel and everyday functional garments crafted in Tokyo and across specialized manufacturing regions in Japan.
         </p>
         <p className="text-xs md:text-sm text-neutral-500 leading-relaxed">
           当サイトは東京を拠点とするインディペンデントなアパレルアーカイブ・カタログです。過度な装飾や即時購入カートを排し、製品の素材組成、実寸寸法、製造背景、およびリリース情報を純粋なカタログ形式で記録・公開しています。

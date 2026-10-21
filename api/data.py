@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Initial product catalog dataset for ARCHIVE TOKYO Python API."""
+"""Initial product catalog dataset for chillandtough Python API."""
 
 DEFAULT_PRODUCTS = [
     {

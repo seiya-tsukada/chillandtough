@@ -2,7 +2,7 @@
 """
 FastAPI Serverless Application for Vercel.
 Entry point: /api/index.py
-Provides catalog management, product CRUD, and telemetry for ARCHIVE TOKYO.
+Provides catalog management, product CRUD, and telemetry for chillandtough.
 """
 
 from typing import List, Optional, Dict, Any
@@ -14,8 +14,8 @@ import copy
 from .data import DEFAULT_PRODUCTS
 
 app = FastAPI(
-    title="ARCHIVE TOKYO Catalog API",
-    description="Python API for ARCHIVE TOKYO minimalist catalog and admin management.",
+    title="chillandtough Catalog API",
+    description="Python API for chillandtough minimalist catalog and admin management.",
     version="1.0.0"
 )
 
