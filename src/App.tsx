@@ -19,8 +19,6 @@ import { CartItem, Category, Product } from './types/catalog';
 import { Grid2X2, Grid3X3, LayoutGrid, Lock } from 'lucide-react';
 
 const CART_STORAGE_KEY = 'chillandtough_cart_v1';
-// Key used before the brand rename; read once so saved carts carry over
-const LEGACY_CART_STORAGE_KEY = 'archive_tokyo_cart_v1';
 
 export default function App() {
   // Route state: check if initial path is /admin
@@ -40,9 +38,7 @@ export default function App() {
   // Cart state (persisted per browser)
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
     try {
-      return JSON.parse(
-        localStorage.getItem(CART_STORAGE_KEY) ?? localStorage.getItem(LEGACY_CART_STORAGE_KEY) ?? '[]'
-      );
+      return JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || '[]');
     } catch {
       return [];
     }

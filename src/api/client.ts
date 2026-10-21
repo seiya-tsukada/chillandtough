@@ -2,13 +2,11 @@ import { Product } from '../types/catalog';
 import { PRODUCTS } from '../data/products';
 
 const STORAGE_KEY = 'chillandtough_products_v1';
-// Key used before the brand rename; read once so saved edits carry over
-const LEGACY_STORAGE_KEY = 'archive_tokyo_products_v1';
 
 // Initialize local storage fallback with default dataset
 function getStoredProducts(): Product[] {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(LEGACY_STORAGE_KEY);
+    const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(PRODUCTS));
       return PRODUCTS;
