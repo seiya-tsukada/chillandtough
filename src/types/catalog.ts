@@ -35,3 +35,9 @@ export interface Product {
   measurements: SizeMeasurement[];
   details: string[];
 }
+
+export interface CartItem {
+  productId: string;
+  size: string;
+  quantity: number;
+}

@@ -8,6 +8,8 @@ interface ProductModalProps {
   currency: 'JPY' | 'USD';
   onPrevProduct: () => void;
   onNextProduct: () => void;
+  onAddToCart: (product: Product, size: string) => void;
+  onQuickBuy: (product: Product, size: string) => void;
 }
 
 export const ProductModal: React.FC<ProductModalProps> = ({
@@ -16,12 +18,18 @@ export const ProductModal: React.FC<ProductModalProps> = ({
   currency,
   onPrevProduct,
   onNextProduct,
+  onAddToCart,
+  onQuickBuy,
 }) => {
   const [imgSrc, setImgSrc] = useState<string>('');
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [justAdded, setJustAdded] = useState(false);
 
   useEffect(() => {
     if (product) {
       setImgSrc(product.primaryImage);
+      setSelectedSize(null);
+      setJustAdded(false);
     }
   }, [product]);
 
@@ -58,6 +66,20 @@ export const ProductModal: React.FC<ProductModalProps> = ({
         : product.measurements.map((m) => m.size)
       : ['S', 'M', 'L', 'XL'];
 
+  // Single-size items (e.g. FREE) need no explicit selection
+  const activeSize = availableSizes.length === 1 ? availableSizes[0] : selectedSize;
+
+  const handleAddToCart = () => {
+    if (!activeSize) return;
+    onAddToCart(product, activeSize);
+    setJustAdded(true);
+  };
+
+  const handleQuickBuy = () => {
+    if (!activeSize) return;
+    onQuickBuy(product, activeSize);
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-200"
@@ -71,13 +93,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header / Navigation Strip */}
-        <div className="flex items-center justify-between px-4 py-2.5 border-b border-neutral-100 bg-white">
-          <div className="flex items-center gap-1.5 text-xs font-mono-nums text-neutral-400">
-            <span>{product.code}</span>
-            <span>·</span>
-            <span>{product.season}</span>
-          </div>
-
+        <div className="flex items-center justify-end px-4 py-2.5 border-b border-neutral-100 bg-white">
           <div className="flex items-center gap-1">
             <button
               onClick={onPrevProduct}
@@ -117,7 +133,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
           />
         </div>
 
-        {/* Product Info Body: Title, Price, Sizes, Description */}
+        {/* Product Info Body: Title, Price, Sizes, Purchase CTAs */}
         <div className="p-5 space-y-4 text-left">
           {/* Title & Japanese Subtitle */}
           <div>
@@ -140,31 +156,51 @@ export const ProductModal: React.FC<ProductModalProps> = ({
               SIZE:
             </span>
             <div className="flex items-center gap-1.5">
-              {availableSizes.map((size) => (
-                <span
-                  key={size}
-                  className="px-2 py-0.5 text-xs font-mono-nums border border-neutral-200 text-neutral-800 bg-neutral-50"
-                >
-                  {size}
-                </span>
-              ))}
+              {availableSizes.map((size) => {
+                const isSelected = activeSize === size;
+                return (
+                  <button
+                    key={size}
+                    type="button"
+                    onClick={() => {
+                      setSelectedSize(size);
+                      setJustAdded(false);
+                    }}
+                    aria-pressed={isSelected}
+                    className={`px-2 py-0.5 text-xs font-mono-nums border transition-colors ${
+                      isSelected
+                        ? 'border-neutral-950 bg-neutral-950 text-white'
+                        : 'border-neutral-200 text-neutral-800 bg-neutral-50 hover:border-neutral-500'
+                    }`}
+                  >
+                    {size}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          {/* Colorways */}
-          {product.colors && product.colors.length > 0 && (
-            <div className="flex items-center gap-2 text-xs font-mono-nums text-neutral-600">
-              <span className="text-[11px] uppercase text-neutral-400">
-                COLOR:
-              </span>
-              <span>{product.colors.map((c) => c.name).join(' / ')}</span>
-            </div>
-          )}
-
-          {/* Natural Description (Concise & Clean) */}
-          <div className="pt-2 border-t border-neutral-100 text-xs text-neutral-600 leading-relaxed font-sans space-y-1">
-            <p>{product.descriptionEn}</p>
-            <p className="text-neutral-400 text-[11px]">{product.descriptionJp}</p>
+          {/* Purchase CTAs */}
+          <div className="space-y-2">
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              disabled={!activeSize}
+              className="w-full py-2.5 text-xs font-semibold tracking-wide bg-neutral-950 text-white hover:bg-neutral-800 disabled:bg-neutral-300 disabled:cursor-not-allowed transition-colors"
+            >
+              {justAdded ? 'カートに追加しました ✓' : 'カートに入れる'}
+            </button>
+            <button
+              type="button"
+              onClick={handleQuickBuy}
+              disabled={!activeSize}
+              className="w-full py-2.5 text-xs font-semibold tracking-wide border border-neutral-950 text-neutral-950 hover:bg-neutral-100 disabled:border-neutral-300 disabled:text-neutral-300 disabled:cursor-not-allowed transition-colors"
+            >
+              Quick buy
+            </button>
+            {!activeSize && (
+              <p className="text-[11px] text-neutral-400 font-sans">サイズを選択してください</p>
+            )}
           </div>
         </div>
       </div>
