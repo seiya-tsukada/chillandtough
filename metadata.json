@@ -1,0 +1,6 @@
+{
+  "name": "AURA CURATED | Experiential Commerce & Python Admin Engine",
+  "description": "Instagram-style experiential commerce platform with interactive shoppable feeds, multi-slide carousels, and FastAPI Python backend admin architecture for marketing and analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
