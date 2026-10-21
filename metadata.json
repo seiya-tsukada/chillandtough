@@ -1,6 +1,6 @@
 {
-  "name": "AURA CURATED | Experiential Commerce & Python Admin Engine",
-  "description": "Instagram-style experiential commerce platform with interactive shoppable feeds, multi-slide carousels, and FastAPI Python backend admin architecture for marketing and analytics.",
+  "name": "ARCHIVE TOKYO — Product Catalog",
+  "description": "Minimalist apparel and lifestyle goods catalog archive. Tokyo, Japan.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

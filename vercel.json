@@ -1,26 +1,14 @@
 {
-  "services": {
-    "app": {
-      "root": ".",
-      "framework": "vite"
-    },
-    "api": {
-      "root": "api",
-      "framework": "fastapi"
-    }
-  },
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": {
-        "service": "api"
-      }
+      "destination": "/api/index.py"
     },
     {
       "source": "/(.*)",
-      "destination": {
-        "service": "app"
-      }
+      "destination": "/index.html"
     }
   ]
 }
