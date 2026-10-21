@@ -7,14 +7,18 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Header } from './components/Header';
 import { ProductCard } from './components/ProductCard';
 import { ProductModal } from './components/ProductModal';
+import { CartDrawer } from './components/CartDrawer';
+import { QuickBuyModal } from './components/QuickBuyModal';
 import { IndexTable } from './components/IndexTable';
 import { LookbookView } from './components/LookbookView';
 import { InfoView } from './components/InfoView';
 import { AdminDashboard } from './admin/AdminDashboard';
 import { catalogApi } from './api/client';
 import { PRODUCTS as INITIAL_PRODUCTS } from './data/products';
-import { Category, Product } from './types/catalog';
+import { CartItem, Category, Product } from './types/catalog';
 import { Grid2X2, Grid3X3, LayoutGrid, Lock } from 'lucide-react';
+
+const CART_STORAGE_KEY = 'archive_tokyo_cart_v1';
 
 export default function App() {
   // Route state: check if initial path is /admin
@@ -30,6 +34,51 @@ export default function App() {
   // Filters & layout state
   const [selectedCategory, setSelectedCategory] = useState<Category>('ALL');
   const [columns, setColumns] = useState<2 | 3 | 4>(3);
+
+  // Cart state (persisted per browser)
+  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || '[]');
+    } catch {
+      return [];
+    }
+  });
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
+    } catch {
+      // Storage unavailable (private mode etc.)
+    }
+  }, [cartItems]);
+
+  const addToCart = (product: Product, size: string) => {
+    setCartItems((items) => {
+      const existing = items.find((i) => i.productId === product.id && i.size === size);
+      if (existing) {
+        return items.map((i) => (i === existing ? { ...i, quantity: i.quantity + 1 } : i));
+      }
+      return [...items, { productId: product.id, size, quantity: 1 }];
+    });
+  };
+
+  const updateCartQuantity = (productId: string, size: string, quantity: number) => {
+    setCartItems((items) =>
+      quantity <= 0
+        ? items.filter((i) => !(i.productId === productId && i.size === size))
+        : items.map((i) => (i.productId === productId && i.size === size ? { ...i, quantity } : i))
+    );
+  };
+
+  const [quickBuyItem, setQuickBuyItem] = useState<{ product: Product; size: string } | null>(null);
+
+  const quickBuy = (product: Product, size: string) => {
+    setSelectedProduct(null);
+    setQuickBuyItem({ product, size });
+  };
+
+  const cartCount = cartItems.reduce((n, i) => n + i.quantity, 0);
 
   // Load products from API / local sync
   const refreshProducts = async () => {
@@ -109,6 +158,8 @@ export default function App() {
         currency={currency}
         setCurrency={setCurrency}
         itemCount={products.length}
+        cartCount={cartCount}
+        onOpenCart={() => setIsCartOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -234,6 +285,23 @@ export default function App() {
         currency={currency}
         onPrevProduct={handlePrevProduct}
         onNextProduct={handleNextProduct}
+        onAddToCart={addToCart}
+        onQuickBuy={quickBuy}
+      />
+
+      <QuickBuyModal
+        item={quickBuyItem}
+        onClose={() => setQuickBuyItem(null)}
+        currency={currency}
+      />
+
+      <CartDrawer
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        items={cartItems}
+        products={products}
+        currency={currency}
+        onUpdateQuantity={updateCartQuantity}
       />
 
       {/* Quiet Minimalist Tokyo Footer */}

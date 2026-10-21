@@ -6,6 +6,8 @@ interface HeaderProps {
   currency: 'JPY' | 'USD';
   setCurrency: (c: 'JPY' | 'USD') => void;
   itemCount: number;
+  cartCount: number;
+  onOpenCart: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -14,6 +16,8 @@ export const Header: React.FC<HeaderProps> = ({
   currency,
   setCurrency,
   itemCount,
+  cartCount,
+  onOpenCart,
 }) => {
   return (
     <header className="sticky top-0 z-30 bg-[#fafafa]/95 backdrop-blur-md border-b border-neutral-200/80 px-4 md:px-8 py-3.5 transition-colors">
@@ -78,6 +82,13 @@ export const Header: React.FC<HeaderProps> = ({
             title="Toggle currency display"
           >
             {currency === 'JPY' ? '¥ JPY' : '$ USD'}
+          </button>
+          <button
+            onClick={onOpenCart}
+            className="text-xs font-mono-nums px-2.5 py-1 text-white bg-neutral-950 hover:bg-neutral-800 rounded border border-neutral-950 transition-colors whitespace-nowrap shrink-0"
+            title="Open cart"
+          >
+            Cart ({cartCount})
           </button>
         </div>
       </div>
