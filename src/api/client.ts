@@ -1,9 +1,18 @@
 import { Product } from '../types/catalog';
 import { PRODUCTS } from '../data/products';
+import { ALL_FILTER } from '../constants/catalog';
+import { STORAGE_KEYS } from '../constants/storage';
+import {
+  API_ENDPOINTS,
+  API_STATUS_MESSAGES,
+  DEFAULT_API_RUNTIME,
+  FALLBACK_RUNTIME,
+  PRODUCT_ID_PREFIX,
+} from '../constants/api';
 
-const STORAGE_KEY = 'chillandtough_products_v1';
+const STORAGE_KEY = STORAGE_KEYS.PRODUCTS;
 
-// Initialize local storage fallback with default dataset
+// Seed local storage with the default dataset on first access
 function getStoredProducts(): Product[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -38,7 +47,7 @@ export const catalogApi = {
    */
   async checkStatus(): Promise<ApiStatus> {
     try {
-      const res = await fetch('/api/health', {
+      const res = await fetch(API_ENDPOINTS.HEALTH, {
         method: 'GET',
         headers: { 'Accept': 'application/json' },
       });
@@ -46,20 +55,20 @@ export const catalogApi = {
         const data = await res.json();
         return {
           connected: true,
-          runtime: data.runtime || 'python-fastapi',
+          runtime: data.runtime || DEFAULT_API_RUNTIME,
           source: 'python_api',
-          message: 'Connected to Python FastAPI backend (Vercel ready)',
+          message: API_STATUS_MESSAGES.CONNECTED,
         };
       }
     } catch {
-      // Offline / fallback
+      // API unreachable: use local fallback
     }
 
     return {
       connected: false,
-      runtime: 'local-state-cache',
+      runtime: FALLBACK_RUNTIME,
       source: 'local_fallback',
-      message: 'Running client-side mock/storage (Deploy to Vercel to activate Python Serverless Functions)',
+      message: API_STATUS_MESSAGES.FALLBACK,
     };
   },
 
@@ -69,11 +78,11 @@ export const catalogApi = {
   async getProducts(params?: { category?: string; season?: string; q?: string }): Promise<Product[]> {
     try {
       const query = new URLSearchParams();
-      if (params?.category && params.category !== 'ALL') query.set('category', params.category);
-      if (params?.season && params.season !== 'ALL') query.set('season', params.season);
+      if (params?.category && params.category !== ALL_FILTER) query.set('category', params.category);
+      if (params?.season && params.season !== ALL_FILTER) query.set('season', params.season);
       if (params?.q) query.set('q', params.q);
 
-      const res = await fetch(`/api/products?${query.toString()}`);
+      const res = await fetch(`${API_ENDPOINTS.PRODUCTS}?${query.toString()}`);
       if (res.ok) {
         return await res.json();
       }
@@ -83,10 +92,10 @@ export const catalogApi = {
 
     // Client-side fallback filter
     let items = getStoredProducts();
-    if (params?.category && params.category !== 'ALL') {
+    if (params?.category && params.category !== ALL_FILTER) {
       items = items.filter((p) => p.category === params.category);
     }
-    if (params?.season && params.season !== 'ALL') {
+    if (params?.season && params.season !== ALL_FILTER) {
       items = items.filter((p) => p.season === params.season);
     }
     if (params?.q) {
@@ -107,11 +116,11 @@ export const catalogApi = {
   async createProduct(newProduct: Omit<Product, 'id'>): Promise<Product> {
     const productWithId: Product = {
       ...newProduct,
-      id: `at-${Date.now()}-${newProduct.code.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
+      id: `${PRODUCT_ID_PREFIX}-${Date.now()}-${newProduct.code.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
     };
 
     try {
-      const res = await fetch('/api/products', {
+      const res = await fetch(API_ENDPOINTS.PRODUCTS, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(productWithId),
@@ -135,7 +144,7 @@ export const catalogApi = {
    */
   async updateProduct(id: string, updates: Partial<Product>): Promise<Product> {
     try {
-      const res = await fetch(`/api/products/${encodeURIComponent(id)}`, {
+      const res = await fetch(API_ENDPOINTS.product(id), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updates),
@@ -164,7 +173,7 @@ export const catalogApi = {
    */
   async deleteProduct(id: string): Promise<boolean> {
     try {
-      const res = await fetch(`/api/products/${encodeURIComponent(id)}`, {
+      const res = await fetch(API_ENDPOINTS.product(id), {
         method: 'DELETE',
       });
       if (res.ok) {
@@ -185,7 +194,7 @@ export const catalogApi = {
    */
   async resetCatalog(): Promise<Product[]> {
     try {
-      const res = await fetch('/api/admin/reset', { method: 'POST' });
+      const res = await fetch(API_ENDPOINTS.ADMIN_RESET, { method: 'POST' });
       if (res.ok) {
         return await catalogApi.getProducts();
       }

@@ -1,4 +1,5 @@
 import React from 'react';
+import { BRAND_NAME } from '../constants/brand';
 
 export const InfoView: React.FC = () => {
   return (
@@ -9,7 +10,7 @@ export const InfoView: React.FC = () => {
           DOCUMENTATION · ARCHIVE ARCHITECTURE
         </span>
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-neutral-950 font-sans">
-          chillandtough
+          {BRAND_NAME}
         </h1>
         <p className="text-sm md:text-base text-neutral-700 leading-relaxed font-sans">
           chillandtough is an unadorned, non-commercial catalog and permanent digital archive documenting limited apparel and everyday functional garments crafted in Tokyo and across specialized manufacturing regions in Japan.

@@ -1,22 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Product } from '../types/catalog';
+import { Currency, QuickBuyItem } from '../types/catalog';
+import { PREFECTURES, QUANTITY_OPTIONS } from '../constants/checkout';
+import { formatAmount as formatCurrencyAmount, getUnitPrice } from '../utils/format';
+import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 import { X, Lock } from 'lucide-react';
 
 interface QuickBuyModalProps {
-  item: { product: Product; size: string } | null;
+  item: QuickBuyItem | null;
   onClose: () => void;
-  currency: 'JPY' | 'USD';
+  currency: Currency;
 }
-
-const PREFECTURES = [
-  '北海道', '青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県',
-  '茨城県', '栃木県', '群馬県', '埼玉県', '千葉県', '東京都', '神奈川県',
-  '新潟県', '富山県', '石川県', '福井県', '山梨県', '長野県', '岐阜県',
-  '静岡県', '愛知県', '三重県', '滋賀県', '京都府', '大阪府', '兵庫県',
-  '奈良県', '和歌山県', '鳥取県', '島根県', '岡山県', '広島県', '山口県',
-  '徳島県', '香川県', '愛媛県', '高知県', '福岡県', '佐賀県', '長崎県',
-  '熊本県', '大分県', '宮崎県', '鹿児島県', '沖縄県',
-];
 
 const inputClass =
   'w-full px-2.5 py-2 text-xs font-sans border border-neutral-200 bg-white text-neutral-900 placeholder:text-neutral-300 focus:outline-none focus:border-neutral-950 transition-colors';
@@ -36,23 +29,13 @@ export const QuickBuyModal: React.FC<QuickBuyModalProps> = ({ item, onClose, cur
     setQuantity(1);
   }, [item]);
 
-  useEffect(() => {
-    if (!item) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [item, onClose]);
+  useKeyboardShortcuts({ Escape: onClose }, !!item);
 
   if (!item) return null;
   const { product, size } = item;
 
-  const unitPrice = currency === 'JPY' ? product.priceJpy : product.priceUsd;
-  const formatAmount = (amount: number) =>
-    currency === 'JPY'
-      ? `¥${amount.toLocaleString('ja-JP')}`
-      : `$${amount.toLocaleString('en-US')}`;
+  const unitPrice = getUnitPrice(product, currency);
+  const formatAmount = (amount: number) => formatCurrencyAmount(amount, currency);
   const total = unitPrice * quantity;
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -106,7 +89,7 @@ export const QuickBuyModal: React.FC<QuickBuyModalProps> = ({ item, onClose, cur
                       onChange={(e) => setQuantity(Number(e.target.value))}
                       className="border border-neutral-200 px-1 py-0.5 text-neutral-900 bg-white"
                     >
-                      {[1, 2, 3, 4, 5].map((n) => (
+                      {QUANTITY_OPTIONS.map((n) => (
                         <option key={n} value={n}>
                           {n}
                         </option>

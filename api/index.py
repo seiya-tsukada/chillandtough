@@ -12,11 +12,32 @@ from pydantic import BaseModel, Field
 import copy
 
 from .data import DEFAULT_PRODUCTS
+from .constants import (
+    ACTIVE_SEASON,
+    ALL_FILTER,
+    APP_DESCRIPTION,
+    APP_TITLE,
+    APP_VERSION,
+    ARCHIVE_STATUS,
+    DEFAULT_COLOR_HEX,
+    DEFAULT_ORIGIN,
+    DEFAULT_PRIMARY_IMAGE,
+    DEFAULT_STATUS,
+    HEALTH_TIMESTAMP,
+    MSG_DUPLICATE_CODE,
+    MSG_PRODUCT_NOT_FOUND,
+    MSG_PRODUCT_NOT_FOUND_IN_ARCHIVE,
+    PLATFORM_NAME,
+    PRODUCT_ID_PREFIX,
+    RUNTIME_NAME,
+    STATS_RUNTIME_LABEL,
+    UNKNOWN_CATEGORY,
+)
 
 app = FastAPI(
-    title="chillandtough Catalog API",
-    description="Python API for chillandtough minimalist catalog and admin management.",
-    version="1.0.0"
+    title=APP_TITLE,
+    description=APP_DESCRIPTION,
+    version=APP_VERSION
 )
 
 # Enable CORS for local dev and Vercel domains
@@ -35,7 +56,7 @@ products_db: List[Dict[str, Any]] = copy.deepcopy(DEFAULT_PRODUCTS)
 # --- Pydantic Data Models ---
 class ColorItem(BaseModel):
     name: str
-    hex: str = "#111111"
+    hex: str = DEFAULT_COLOR_HEX
 
 
 class SizeMeasurementItem(BaseModel):
@@ -60,11 +81,11 @@ class ProductCreate(BaseModel):
     priceUsd: int = Field(..., example=280)
     colors: List[ColorItem] = []
     material: str = Field(..., example="100% High-Density Ripstop Nylon")
-    origin: str = Field(default="MADE IN JAPAN (TOKYO)")
+    origin: str = Field(default=DEFAULT_ORIGIN)
     descriptionEn: str = Field(default="")
     descriptionJp: str = Field(default="")
-    primaryImage: str = Field(default="/src/assets/images/catalog_nylon_jacket_1792555601489.jpg")
-    status: str = Field(default="ARCHIVE")
+    primaryImage: str = Field(default=DEFAULT_PRIMARY_IMAGE)
+    status: str = Field(default=DEFAULT_STATUS)
     measurements: List[SizeMeasurementItem] = []
     details: List[str] = []
 
@@ -96,10 +117,10 @@ def health_check():
     """Health check endpoint to verify Python API runtime on Vercel."""
     return {
         "status": "ok",
-        "runtime": "python-fastapi",
-        "platform": "vercel",
+        "runtime": RUNTIME_NAME,
+        "platform": PLATFORM_NAME,
         "catalogItems": len(products_db),
-        "timestamp": "2026-10-21T04:15:00Z"
+        "timestamp": HEALTH_TIMESTAMP
     }
 
 
@@ -112,10 +133,10 @@ def list_products(
     """Retrieve catalog items with optional filtering and query search."""
     results = products_db
 
-    if category and category.upper() != "ALL":
+    if category and category.upper() != ALL_FILTER:
         results = [p for p in results if p.get("category", "").upper() == category.upper()]
 
-    if season and season.upper() != "ALL":
+    if season and season.upper() != ALL_FILTER:
         results = [p for p in results if p.get("season", "").upper() == season.upper()]
 
     if q:
@@ -137,7 +158,7 @@ def get_product(product_id: str):
     for p in products_db:
         if p.get("id") == product_id or p.get("code") == product_id:
             return p
-    raise HTTPException(status_code=404, detail="Product not found in catalog archive.")
+    raise HTTPException(status_code=404, detail=MSG_PRODUCT_NOT_FOUND_IN_ARCHIVE)
 
 
 @app.post("/api/products", status_code=status.HTTP_201_CREATED)
@@ -146,11 +167,11 @@ def create_product(product: ProductCreate):
     # Check duplicate SKU
     for existing in products_db:
         if existing.get("code") == product.code:
-            raise HTTPException(status_code=400, detail=f"Product code '{product.code}' already exists.")
+            raise HTTPException(status_code=400, detail=MSG_DUPLICATE_CODE.format(code=product.code))
 
     new_dict = product.model_dump()
     if not new_dict.get("id"):
-        new_dict["id"] = f"at-{len(products_db) + 1:02d}-{product.code.lower().replace('/', '-')}"
+        new_dict["id"] = f"{PRODUCT_ID_PREFIX}-{len(products_db) + 1:02d}-{product.code.lower().replace('/', '-')}"
 
     products_db.insert(0, new_dict)
     return new_dict
@@ -166,7 +187,7 @@ def update_product(product_id: str, updates: ProductUpdate):
             products_db[index] = existing
             return existing
 
-    raise HTTPException(status_code=404, detail="Product not found.")
+    raise HTTPException(status_code=404, detail=MSG_PRODUCT_NOT_FOUND)
 
 
 @app.delete("/api/products/{product_id}")
@@ -177,7 +198,7 @@ def delete_product(product_id: str):
     products_db = [p for p in products_db if p.get("id") != product_id and p.get("code") != product_id]
 
     if len(products_db) == initial_len:
-        raise HTTPException(status_code=404, detail="Product not found.")
+        raise HTTPException(status_code=404, detail=MSG_PRODUCT_NOT_FOUND)
 
     return {"deleted": True, "productId": product_id, "remainingCount": len(products_db)}
 
@@ -190,7 +211,7 @@ def get_admin_stats():
     total_val_jpy = 0
 
     for p in products_db:
-        cat = p.get("category", "OTHER")
+        cat = p.get("category", UNKNOWN_CATEGORY)
         categories_count[cat] = categories_count.get(cat, 0) + 1
         total_val_jpy += p.get("priceJpy", 0)
 
@@ -198,9 +219,9 @@ def get_admin_stats():
         "totalProducts": total,
         "categories": categories_count,
         "totalValuationJpy": total_val_jpy,
-        "activeSeason": "2026 S/S",
-        "archiveStatus": "Synchronized",
-        "runtime": "Python 3 / FastAPI"
+        "activeSeason": ACTIVE_SEASON,
+        "archiveStatus": ARCHIVE_STATUS,
+        "runtime": STATS_RUNTIME_LABEL
     }
 
 

@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Product } from '../types/catalog';
+import { Currency, Product } from '../types/catalog';
+import { DEFAULT_SIZES, FREE_SIZE } from '../constants/catalog';
+import { formatAmountWithTax, getUnitPrice } from '../utils/format';
+import { getFallbackImageSrc } from '../utils/image';
+import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface ProductModalProps {
   product: Product | null;
   onClose: () => void;
-  currency: 'JPY' | 'USD';
+  currency: Currency;
   onPrevProduct: () => void;
   onNextProduct: () => void;
   onAddToCart: (product: Product, size: string) => void;
@@ -33,38 +37,28 @@ export const ProductModal: React.FC<ProductModalProps> = ({
     }
   }, [product]);
 
-  // Keyboard navigation & escape listener
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-      if (e.key === 'ArrowLeft') onPrevProduct();
-      if (e.key === 'ArrowRight') onNextProduct();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClose, onPrevProduct, onNextProduct]);
+  useKeyboardShortcuts({
+    Escape: onClose,
+    ArrowLeft: onPrevProduct,
+    ArrowRight: onNextProduct,
+  });
 
   if (!product) return null;
 
-  const formattedPrice =
-    currency === 'JPY'
-      ? `¥${product.priceJpy.toLocaleString('ja-JP')} (税込)`
-      : `$${product.priceUsd.toLocaleString('en-US')}`;
+  const formattedPrice = formatAmountWithTax(getUnitPrice(product, currency), currency);
 
   const handleImageError = () => {
-    if (imgSrc.startsWith('/src/assets/images/')) {
-      const filename = imgSrc.replace('/src/assets/images/', '');
-      setImgSrc(`/images/${filename}`);
-    }
+    const fallback = getFallbackImageSrc(imgSrc);
+    if (fallback) setImgSrc(fallback);
   };
 
   // Distinct list of available sizes (e.g., S, M, L, XL or FREE)
   const availableSizes =
     product.measurements && product.measurements.length > 0 && product.measurements[0].size
       ? product.category === 'GOODS'
-        ? ['FREE']
+        ? [FREE_SIZE]
         : product.measurements.map((m) => m.size)
-      : ['S', 'M', 'L', 'XL'];
+      : DEFAULT_SIZES;
 
   // Single-size items (e.g. FREE) need no explicit selection
   const activeSize = availableSizes.length === 1 ? availableSizes[0] : selectedSize;
@@ -87,12 +81,11 @@ export const ProductModal: React.FC<ProductModalProps> = ({
       role="dialog"
       aria-modal="true"
     >
-      {/* Centered Compact Floating Modal */}
       <div
         className="relative w-full max-w-[420px] bg-white border border-neutral-200 shadow-2xl overflow-hidden transition-all transform scale-100 animate-in fade-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Top Header / Navigation Strip */}
+        {/* Navigation strip */}
         <div className="flex items-center justify-end px-4 py-2.5 border-b border-neutral-100 bg-white">
           <div className="flex items-center gap-1">
             <button
@@ -133,7 +126,6 @@ export const ProductModal: React.FC<ProductModalProps> = ({
           />
         </div>
 
-        {/* Product Info Body: Title, Price, Sizes, Purchase CTAs */}
         <div className="p-5 space-y-4 text-left">
           {/* Title & Japanese Subtitle */}
           <div>
@@ -150,7 +142,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
             {formattedPrice}
           </div>
 
-          {/* Available Sizes (S, M, L, XL) */}
+          {/* Sizes */}
           <div className="flex items-center gap-2 pt-1 border-t border-neutral-100">
             <span className="text-[11px] font-mono-nums uppercase text-neutral-400">
               SIZE:

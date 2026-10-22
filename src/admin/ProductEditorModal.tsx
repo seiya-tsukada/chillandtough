@@ -1,5 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { Product, Category, ReleaseSeason, SizeMeasurement } from '../types/catalog';
+import {
+  Product,
+  Category,
+  ProductColor,
+  ProductStatus,
+  ReleaseSeason,
+  SizeMeasurement,
+} from '../types/catalog';
+import {
+  BOTTOMS_MEASUREMENT_COLUMNS,
+  MEASUREMENT_COLUMNS,
+  MeasurementField,
+  PRODUCT_CATEGORIES,
+  PRODUCT_STATUSES,
+  RELEASE_SEASONS,
+} from '../constants/catalog';
+import {
+  DEFAULT_COLOR,
+  INITIAL_EDITOR_VALUES,
+  NEW_COLOR,
+  NEW_PRODUCT_CODE_PREFIX,
+  NEW_PRODUCT_DEFAULTS,
+} from '../constants/admin';
+import { SAMPLE_IMAGES } from '../constants/images';
+import { todayAsReleaseDate } from '../utils/format';
 import { X, Plus, Trash2, Check } from 'lucide-react';
 
 interface ProductEditorModalProps {
@@ -9,16 +33,9 @@ interface ProductEditorModalProps {
   onSave: (productData: Omit<Product, 'id'>, id?: string) => void;
 }
 
-const SAMPLE_IMAGES = [
-  { label: 'Nylon Track Jacket (Black)', url: '/images/catalog_nylon_jacket_1792555601489.jpg' },
-  { label: 'Loopwheel Hoodie (Ash)', url: '/images/catalog_loopwheel_hoodie_1792555602331.jpg' },
-  { label: 'Border Stripe L/S Tee', url: '/images/catalog_border_tee_1792555602999.jpg' },
-  { label: 'Nylon Easy Pants (Black)', url: '/images/catalog_nylon_pants_1792555625588.jpg' },
-  { label: 'Crewneck Sweatshirt (Navy)', url: '/images/catalog_navy_crewneck_1792555626364.jpg' },
-  { label: 'Oxford B.D. Shirt (White)', url: '/images/catalog_oxford_shirt_1792555626446.jpg' },
-  { label: 'Heavy Canvas Tote (Ecru)', url: '/images/catalog_canvas_tote_1792555626362.jpg' },
-  { label: 'Cap & Socks Set', url: '/images/catalog_caps_and_socks_1792555602987.jpg' },
-];
+// Measurement rows are edited in place, so never hand out the shared defaults directly
+const cloneMeasurements = (rows: SizeMeasurement[]): SizeMeasurement[] =>
+  rows.map((row) => ({ ...row }));
 
 export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
   product,
@@ -26,93 +43,79 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
   onClose,
   onSave,
 }) => {
-  const [code, setCode] = useState('');
-  const [titleEn, setTitleEn] = useState('');
-  const [titleJp, setTitleJp] = useState('');
-  const [category, setCategory] = useState<Category>('OUTERWEAR');
-  const [season, setSeason] = useState<ReleaseSeason>('2026 S/S');
-  const [releaseDate, setReleaseDate] = useState('');
-  const [priceJpy, setPriceJpy] = useState<number>(30000);
-  const [priceUsd, setPriceUsd] = useState<number>(200);
-  const [material, setMaterial] = useState('');
-  const [origin, setOrigin] = useState('MADE IN JAPAN (TOKYO)');
-  const [descriptionEn, setDescriptionEn] = useState('');
-  const [descriptionJp, setDescriptionJp] = useState('');
-  const [primaryImage, setPrimaryImage] = useState(SAMPLE_IMAGES[0].url);
-  const [status, setStatus] = useState<'ARCHIVE' | 'RELEASED' | 'LOTTERY CLOSED'>('ARCHIVE');
-  const [colors, setColors] = useState<{ name: string; hex: string }[]>([
-    { name: 'BLACK', hex: '#111111' },
-  ]);
-  const [measurements, setMeasurements] = useState<SizeMeasurement[]>([
-    { size: 'S', length: 68, chest: 62, shoulder: 54, sleeve: 60 },
-    { size: 'M', length: 71, chest: 65, shoulder: 56, sleeve: 62 },
-    { size: 'L', length: 74, chest: 68, shoulder: 58, sleeve: 64 },
-    { size: 'XL', length: 77, chest: 71, shoulder: 60, sleeve: 66 },
-  ]);
-  const [details, setDetails] = useState<string[]>(['Tokyo minimal cut', 'Pre-washed fabric']);
+  const [code, setCode] = useState(INITIAL_EDITOR_VALUES.code);
+  const [titleEn, setTitleEn] = useState(INITIAL_EDITOR_VALUES.titleEn);
+  const [titleJp, setTitleJp] = useState(INITIAL_EDITOR_VALUES.titleJp);
+  const [category, setCategory] = useState<Category>(INITIAL_EDITOR_VALUES.category);
+  const [season, setSeason] = useState<ReleaseSeason>(INITIAL_EDITOR_VALUES.season);
+  const [releaseDate, setReleaseDate] = useState(INITIAL_EDITOR_VALUES.releaseDate);
+  const [priceJpy, setPriceJpy] = useState<number>(INITIAL_EDITOR_VALUES.priceJpy);
+  const [priceUsd, setPriceUsd] = useState<number>(INITIAL_EDITOR_VALUES.priceUsd);
+  const [material, setMaterial] = useState(INITIAL_EDITOR_VALUES.material);
+  const [origin, setOrigin] = useState(INITIAL_EDITOR_VALUES.origin);
+  const [descriptionEn, setDescriptionEn] = useState(INITIAL_EDITOR_VALUES.descriptionEn);
+  const [descriptionJp, setDescriptionJp] = useState(INITIAL_EDITOR_VALUES.descriptionJp);
+  const [primaryImage, setPrimaryImage] = useState(INITIAL_EDITOR_VALUES.primaryImage);
+  const [status, setStatus] = useState<ProductStatus>(INITIAL_EDITOR_VALUES.status);
+  const [colors, setColors] = useState<ProductColor[]>(INITIAL_EDITOR_VALUES.colors);
+  const [measurements, setMeasurements] = useState<SizeMeasurement[]>(() =>
+    cloneMeasurements(INITIAL_EDITOR_VALUES.measurements)
+  );
+  const [details, setDetails] = useState<string[]>(INITIAL_EDITOR_VALUES.details);
   const [newDetailText, setNewDetailText] = useState('');
 
   useEffect(() => {
-    if (product) {
-      setCode(product.code);
-      setTitleEn(product.titleEn);
-      setTitleJp(product.titleJp);
-      setCategory(product.category);
-      setSeason(product.season);
-      setReleaseDate(product.releaseDate);
-      setPriceJpy(product.priceJpy);
-      setPriceUsd(product.priceUsd);
-      setMaterial(product.material);
-      setOrigin(product.origin);
-      setDescriptionEn(product.descriptionEn);
-      setDescriptionJp(product.descriptionJp);
-      setPrimaryImage(product.primaryImage);
-      setStatus(product.status);
-      setColors(product.colors || [{ name: 'BLACK', hex: '#111111' }]);
-      setMeasurements(product.measurements || []);
-      setDetails(product.details || []);
-    } else {
-      // Defaults for new product
-      setCode(`AT-NEW${Math.floor(Math.random() * 90 + 10)}`);
-      setTitleEn('NEW CATALOG ITEM');
-      setTitleJp('新規カタログアイテム');
-      setCategory('TOPS');
-      setSeason('2026 S/S');
-      setReleaseDate(new Date().toISOString().slice(0, 10).replace(/-/g, '.'));
-      setPriceJpy(25000);
-      setPriceUsd(165);
-      setMaterial('100% Japanese Combed Cotton');
-      setOrigin('MADE IN JAPAN (TOKYO)');
-      setDescriptionEn('Minimalist everyday garment crafted with Tokyo design specifications.');
-      setDescriptionJp('東京の美意識に基づき仕立てられたミニマルなデイリーウェア。');
-      setPrimaryImage(SAMPLE_IMAGES[0].url);
-      setStatus('ARCHIVE');
-      setColors([{ name: 'BLACK', hex: '#111111' }, { name: 'WHITE', hex: '#ffffff' }]);
-      setMeasurements([
-        { size: 'S', length: 68, chest: 62, shoulder: 54, sleeve: 60 },
-        { size: 'M', length: 71, chest: 65, shoulder: 56, sleeve: 62 },
-        { size: 'L', length: 74, chest: 68, shoulder: 58, sleeve: 64 },
-        { size: 'XL', length: 77, chest: 71, shoulder: 60, sleeve: 66 },
-      ]);
-      setDetails(['Relaxed silhouette', 'High durability seams', 'Made in Tokyo']);
-    }
+    const values: Omit<Product, 'id'> = product
+      ? {
+          ...product,
+          colors: product.colors || [DEFAULT_COLOR],
+          measurements: product.measurements || [],
+          details: product.details || [],
+        }
+      : {
+          ...NEW_PRODUCT_DEFAULTS,
+          code: `${NEW_PRODUCT_CODE_PREFIX}${Math.floor(Math.random() * 90 + 10)}`,
+          releaseDate: todayAsReleaseDate(),
+          measurements: cloneMeasurements(NEW_PRODUCT_DEFAULTS.measurements),
+        };
+
+    setCode(values.code);
+    setTitleEn(values.titleEn);
+    setTitleJp(values.titleJp);
+    setCategory(values.category);
+    setSeason(values.season);
+    setReleaseDate(values.releaseDate);
+    setPriceJpy(values.priceJpy);
+    setPriceUsd(values.priceUsd);
+    setMaterial(values.material);
+    setOrigin(values.origin);
+    setDescriptionEn(values.descriptionEn);
+    setDescriptionJp(values.descriptionJp);
+    setPrimaryImage(values.primaryImage);
+    setStatus(values.status);
+    setColors(values.colors);
+    setMeasurements(values.measurements);
+    setDetails(values.details);
   }, [product, isOpen]);
 
   if (!isOpen) return null;
 
+  const measurementColumns =
+    category === 'BOTTOMS' ? [...MEASUREMENT_COLUMNS, ...BOTTOMS_MEASUREMENT_COLUMNS] : MEASUREMENT_COLUMNS;
+
   const handleMeasurementChange = (
     index: number,
-    field: keyof SizeMeasurement,
+    field: MeasurementField,
     val: string
   ) => {
     const updated = [...measurements];
     const num = parseFloat(val) || 0;
-    (updated[index] as any)[field] = num;
+    updated[index][field] = num;
     setMeasurements(updated);
   };
 
   const handleAddColor = () => {
-    setColors([...colors, { name: 'NAVY', hex: '#1a2332' }]);
+    setColors([...colors, NEW_COLOR]);
   };
 
   const handleRemoveColor = (idx: number) => {
@@ -204,10 +207,9 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
                 onChange={(e) => setCategory(e.target.value as Category)}
                 className="w-full text-xs font-mono-nums p-2 bg-white border border-neutral-200 focus:outline-none focus:border-neutral-950"
               >
-                <option value="OUTERWEAR">OUTERWEAR</option>
-                <option value="TOPS">TOPS</option>
-                <option value="BOTTOMS">BOTTOMS</option>
-                <option value="GOODS">GOODS</option>
+                {PRODUCT_CATEGORIES.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
               </select>
             </div>
 
@@ -220,9 +222,9 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
                 onChange={(e) => setSeason(e.target.value as ReleaseSeason)}
                 className="w-full text-xs font-mono-nums p-2 bg-white border border-neutral-200 focus:outline-none focus:border-neutral-950"
               >
-                <option value="2026 S/S">2026 S/S</option>
-                <option value="2025 F/W">2025 F/W</option>
-                <option value="ARCHIVE">ARCHIVE</option>
+                {RELEASE_SEASONS.map((s) => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
               </select>
             </div>
 
@@ -232,12 +234,12 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
               </label>
               <select
                 value={status}
-                onChange={(e) => setStatus(e.target.value as any)}
+                onChange={(e) => setStatus(e.target.value as ProductStatus)}
                 className="w-full text-xs font-mono-nums p-2 bg-white border border-neutral-200 focus:outline-none focus:border-neutral-950"
               >
-                <option value="ARCHIVE">ARCHIVE</option>
-                <option value="RELEASED">RELEASED</option>
-                <option value="LOTTERY CLOSED">LOTTERY CLOSED</option>
+                {PRODUCT_STATUSES.map((s) => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
               </select>
             </div>
           </div>
@@ -397,74 +399,25 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
                 <thead>
                   <tr className="border-b border-neutral-200 text-neutral-500 text-left">
                     <th className="py-1.5">SIZE</th>
-                    <th className="py-1.5">LENGTH (着丈)</th>
-                    <th className="py-1.5">CHEST (身幅)</th>
-                    <th className="py-1.5">SHOULDER (肩幅)</th>
-                    <th className="py-1.5">SLEEVE (袖丈)</th>
-                    {category === 'BOTTOMS' && (
-                      <>
-                        <th className="py-1.5">WAIST (ウエスト)</th>
-                        <th className="py-1.5">INSEAM (股下)</th>
-                      </>
-                    )}
+                    {measurementColumns.map((col) => (
+                      <th key={col.field} className="py-1.5">{col.label}</th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-neutral-100">
                   {measurements.map((m, idx) => (
                     <tr key={m.size}>
                       <td className="py-1.5 font-bold">{m.size}</td>
-                      <td className="py-1.5">
-                        <input
-                          type="number"
-                          value={m.length || ''}
-                          onChange={(e) => handleMeasurementChange(idx, 'length', e.target.value)}
-                          className="w-16 p-1 border border-neutral-200 text-center"
-                        />
-                      </td>
-                      <td className="py-1.5">
-                        <input
-                          type="number"
-                          value={m.chest || ''}
-                          onChange={(e) => handleMeasurementChange(idx, 'chest', e.target.value)}
-                          className="w-16 p-1 border border-neutral-200 text-center"
-                        />
-                      </td>
-                      <td className="py-1.5">
-                        <input
-                          type="number"
-                          value={m.shoulder || ''}
-                          onChange={(e) => handleMeasurementChange(idx, 'shoulder', e.target.value)}
-                          className="w-16 p-1 border border-neutral-200 text-center"
-                        />
-                      </td>
-                      <td className="py-1.5">
-                        <input
-                          type="number"
-                          value={m.sleeve || ''}
-                          onChange={(e) => handleMeasurementChange(idx, 'sleeve', e.target.value)}
-                          className="w-16 p-1 border border-neutral-200 text-center"
-                        />
-                      </td>
-                      {category === 'BOTTOMS' && (
-                        <>
-                          <td className="py-1.5">
-                            <input
-                              type="number"
-                              value={m.waist || ''}
-                              onChange={(e) => handleMeasurementChange(idx, 'waist', e.target.value)}
-                              className="w-16 p-1 border border-neutral-200 text-center"
-                            />
-                          </td>
-                          <td className="py-1.5">
-                            <input
-                              type="number"
-                              value={m.inseam || ''}
-                              onChange={(e) => handleMeasurementChange(idx, 'inseam', e.target.value)}
-                              className="w-16 p-1 border border-neutral-200 text-center"
-                            />
-                          </td>
-                        </>
-                      )}
+                      {measurementColumns.map((col) => (
+                        <td key={col.field} className="py-1.5">
+                          <input
+                            type="number"
+                            value={m[col.field] || ''}
+                            onChange={(e) => handleMeasurementChange(idx, col.field, e.target.value)}
+                            className="w-16 p-1 border border-neutral-200 text-center"
+                          />
+                        </td>
+                      ))}
                     </tr>
                   ))}
                 </tbody>
