@@ -12,6 +12,19 @@ export type Category = 'ALL' | 'OUTERWEAR' | 'TOPS' | 'BOTTOMS' | 'GOODS';
 
 export type ReleaseSeason = '2026 S/S' | '2025 F/W' | 'ARCHIVE';
 
+export type ProductStatus = 'ARCHIVE' | 'RELEASED' | 'LOTTERY CLOSED';
+
+export type Currency = 'JPY' | 'USD';
+
+export type ViewTab = 'CATALOG' | 'INDEX' | 'LOOKBOOK' | 'INFO';
+
+export type GridColumns = 2 | 3 | 4;
+
+export interface ProductColor {
+  name: string;
+  hex: string;
+}
+
 export interface Product {
   id: string;
   code: string;
@@ -22,16 +35,13 @@ export interface Product {
   releaseDate: string;
   priceJpy: number;
   priceUsd: number;
-  colors: {
-    name: string;
-    hex: string;
-  }[];
+  colors: ProductColor[];
   material: string;
   origin: string;
   descriptionEn: string;
   descriptionJp: string;
   primaryImage: string;
-  status: 'ARCHIVE' | 'RELEASED' | 'LOTTERY CLOSED';
+  status: ProductStatus;
   measurements: SizeMeasurement[];
   details: string[];
 }
@@ -40,4 +50,9 @@ export interface CartItem {
   productId: string;
   size: string;
   quantity: number;
+}
+
+export interface QuickBuyItem {
+  product: Product;
+  size: string;
 }

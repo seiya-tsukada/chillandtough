@@ -1,10 +1,11 @@
 import React from 'react';
-import { Product } from '../types/catalog';
+import { Currency, Product } from '../types/catalog';
+import { formatAmount, getUnitPrice } from '../utils/format';
 import { ArrowUpRight } from 'lucide-react';
 
 interface IndexTableProps {
   products: Product[];
-  currency: 'JPY' | 'USD';
+  currency: Currency;
   onSelect: (product: Product) => void;
 }
 
@@ -32,10 +33,7 @@ export const IndexTable: React.FC<IndexTableProps> = ({
         </thead>
         <tbody className="divide-y divide-neutral-100 text-neutral-800">
           {products.map((product) => {
-            const price =
-              currency === 'JPY'
-                ? `¥${product.priceJpy.toLocaleString('ja-JP')}`
-                : `$${product.priceUsd.toLocaleString('en-US')}`;
+            const price = formatAmount(getUnitPrice(product, currency), currency);
 
             return (
               <tr

@@ -1,9 +1,4 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Header } from './components/Header';
 import { ProductCard } from './components/ProductCard';
 import { ProductModal } from './components/ProductModal';
@@ -15,30 +10,53 @@ import { InfoView } from './components/InfoView';
 import { AdminDashboard } from './admin/AdminDashboard';
 import { catalogApi } from './api/client';
 import { PRODUCTS as INITIAL_PRODUCTS } from './data/products';
-import { CartItem, Category, Product } from './types/catalog';
+import { BRAND_NAME, COPYRIGHT_YEAR, ROUTES } from './constants/brand';
+import {
+  ALL_FILTER,
+  CATEGORY_FILTERS,
+  DEFAULT_GRID_COLUMNS,
+  DEFAULT_VIEW_TAB,
+  GRID_OPTIONS,
+} from './constants/catalog';
+import { DEFAULT_CURRENCY } from './constants/currency';
+import { STORAGE_KEYS } from './constants/storage';
+import {
+  CartItem,
+  Category,
+  Currency,
+  GridColumns,
+  Product,
+  QuickBuyItem,
+  ViewTab,
+} from './types/catalog';
 import { Grid2X2, Grid3X3, LayoutGrid, Lock } from 'lucide-react';
 
-const CART_STORAGE_KEY = 'chillandtough_cart_v1';
+const GRID_ICONS = { 2: Grid2X2, 3: Grid3X3, 4: LayoutGrid } as const;
+
+const GRID_LAYOUT_CLASSES: Record<GridColumns, string> = {
+  2: 'grid-cols-1 sm:grid-cols-2',
+  3: 'grid-cols-2 md:grid-cols-3',
+  4: 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4',
+};
+
+const isAdminPath = () => window.location.pathname.startsWith(ROUTES.ADMIN);
 
 export default function App() {
-  // Route state: check if initial path is /admin
-  const [isAdminRoute, setIsAdminRoute] = useState<boolean>(() => {
-    return window.location.pathname.startsWith('/admin');
-  });
+  const [isAdminRoute, setIsAdminRoute] = useState<boolean>(isAdminPath);
 
-  const [currentTab, setCurrentTab] = useState<'CATALOG' | 'INDEX' | 'LOOKBOOK' | 'INFO'>('CATALOG');
-  const [currency, setCurrency] = useState<'JPY' | 'USD'>('JPY');
+  const [currentTab, setCurrentTab] = useState<ViewTab>(DEFAULT_VIEW_TAB);
+  const [currency, setCurrency] = useState<Currency>(DEFAULT_CURRENCY);
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   // Filters & layout state
-  const [selectedCategory, setSelectedCategory] = useState<Category>('ALL');
-  const [columns, setColumns] = useState<2 | 3 | 4>(3);
+  const [selectedCategory, setSelectedCategory] = useState<Category>(ALL_FILTER);
+  const [columns, setColumns] = useState<GridColumns>(DEFAULT_GRID_COLUMNS);
 
   // Cart state (persisted per browser)
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
     try {
-      return JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || '[]');
+      return JSON.parse(localStorage.getItem(STORAGE_KEYS.CART) || '[]');
     } catch {
       return [];
     }
@@ -47,7 +65,7 @@ export default function App() {
 
   useEffect(() => {
     try {
-      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
+      localStorage.setItem(STORAGE_KEYS.CART, JSON.stringify(cartItems));
     } catch {
       // Storage unavailable (private mode etc.)
     }
@@ -71,7 +89,7 @@ export default function App() {
     );
   };
 
-  const [quickBuyItem, setQuickBuyItem] = useState<{ product: Product; size: string } | null>(null);
+  const [quickBuyItem, setQuickBuyItem] = useState<QuickBuyItem | null>(null);
 
   const quickBuy = (product: Product, size: string) => {
     setSelectedProduct(null);
@@ -80,7 +98,6 @@ export default function App() {
 
   const cartCount = cartItems.reduce((n, i) => n + i.quantity, 0);
 
-  // Load products from API / local sync
   const refreshProducts = async () => {
     try {
       const items = await catalogApi.getProducts();
@@ -97,33 +114,31 @@ export default function App() {
   // Handle browser back/forward buttons
   useEffect(() => {
     const handlePopState = () => {
-      setIsAdminRoute(window.location.pathname.startsWith('/admin'));
+      setIsAdminRoute(isAdminPath());
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // Navigation helpers for /admin
   const navigateToAdmin = () => {
-    window.history.pushState({}, '', '/admin');
+    window.history.pushState({}, '', ROUTES.ADMIN);
     setIsAdminRoute(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const navigateToPublic = () => {
-    window.history.pushState({}, '', '/');
+    window.history.pushState({}, '', ROUTES.PUBLIC);
     setIsAdminRoute(false);
     refreshProducts();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Filtered products for public catalog
   const filteredProducts = useMemo(() => {
-    if (selectedCategory === 'ALL') return products;
+    if (selectedCategory === ALL_FILTER) return products;
     return products.filter((item) => item.category === selectedCategory);
   }, [products, selectedCategory]);
 
-  // Modal navigation helpers
+  // Modal prev/next navigation (wraps around)
   const handlePrevProduct = () => {
     if (!selectedProduct) return;
     const currentIndex = filteredProducts.findIndex((p) => p.id === selectedProduct.id);
@@ -144,14 +159,12 @@ export default function App() {
     }
   };
 
-  // If on /admin route, render the TypeScript Admin Dashboard
   if (isAdminRoute) {
     return <AdminDashboard onNavigatePublic={navigateToPublic} />;
   }
 
   return (
     <div className="min-h-screen flex flex-col bg-[#fafafa] text-[#111111]">
-      {/* 3-Zone Top Navigation Contract */}
       <Header
         currentTab={currentTab}
         setCurrentTab={setCurrentTab}
@@ -162,15 +175,13 @@ export default function App() {
         onOpenCart={() => setIsCartOpen(true)}
       />
 
-      {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 md:px-8 py-4 sm:py-6 md:py-8">
         {currentTab === 'CATALOG' && (
           <div className="space-y-6">
-            {/* Minimalist Tokyo Filter Bar: Category & Grid Density Switcher */}
+            {/* Filter bar: category & grid density */}
             <div className="flex items-center justify-between border-b border-neutral-200/80 pb-3">
-              {/* Category Filter: Pure quiet text buttons */}
               <div className="flex items-center gap-1 sm:gap-2">
-                {(['ALL', 'OUTERWEAR', 'TOPS', 'BOTTOMS', 'GOODS'] as Category[]).map((cat) => (
+                {CATEGORY_FILTERS.map((cat) => (
                   <button
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
@@ -185,58 +196,34 @@ export default function App() {
                 ))}
               </div>
 
-              {/* Grid Density Switcher */}
               <div className="flex items-center border border-neutral-200 bg-white">
-                <button
-                  onClick={() => setColumns(2)}
-                  className={`p-1.5 transition-colors ${
-                    columns === 2 ? 'bg-neutral-950 text-white' : 'text-neutral-500 hover:text-neutral-950'
-                  }`}
-                  title="2 Columns (Large)"
-                  aria-label="2 columns view"
-                >
-                  <Grid2X2 className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  onClick={() => setColumns(3)}
-                  className={`p-1.5 transition-colors border-l border-neutral-200 ${
-                    columns === 3 ? 'bg-neutral-950 text-white' : 'text-neutral-500 hover:text-neutral-950'
-                  }`}
-                  title="3 Columns (Standard)"
-                  aria-label="3 columns view"
-                >
-                  <Grid3X3 className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  onClick={() => setColumns(4)}
-                  className={`p-1.5 transition-colors border-l border-neutral-200 ${
-                    columns === 4 ? 'bg-neutral-950 text-white' : 'text-neutral-500 hover:text-neutral-950'
-                  }`}
-                  title="4 Columns (Dense)"
-                  aria-label="4 columns view"
-                >
-                  <LayoutGrid className="w-3.5 h-3.5" />
-                </button>
+                {GRID_OPTIONS.map((option, index) => {
+                  const Icon = GRID_ICONS[option.columns];
+                  return (
+                    <button
+                      key={option.columns}
+                      onClick={() => setColumns(option.columns)}
+                      className={`p-1.5 transition-colors ${index > 0 ? 'border-l border-neutral-200 ' : ''}${
+                        columns === option.columns
+                          ? 'bg-neutral-950 text-white'
+                          : 'text-neutral-500 hover:text-neutral-950'
+                      }`}
+                      title={option.title}
+                      aria-label={option.ariaLabel}
+                    >
+                      <Icon className="w-3.5 h-3.5" />
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Product Cards: Image Only Grid */}
-            <div
-              className={`grid gap-3 sm:gap-5 md:gap-6 ${
-                columns === 2
-                  ? 'grid-cols-1 sm:grid-cols-2'
-                  : columns === 3
-                  ? 'grid-cols-2 md:grid-cols-3'
-                  : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4'
-              }`}
-            >
+            <div className={`grid gap-3 sm:gap-5 md:gap-6 ${GRID_LAYOUT_CLASSES[columns]}`}>
               {filteredProducts.map((product) => (
                 <ProductCard
                   key={product.id}
                   product={product}
-                  currency={currency}
                   onSelect={(p) => setSelectedProduct(p)}
-                  columns={columns}
                 />
               ))}
             </div>
@@ -278,7 +265,6 @@ export default function App() {
         {currentTab === 'INFO' && <InfoView />}
       </main>
 
-      {/* Product Detail Modal: Natural Popup with Title, Description, and Image */}
       <ProductModal
         product={selectedProduct}
         onClose={() => setSelectedProduct(null)}
@@ -304,11 +290,10 @@ export default function App() {
         onUpdateQuantity={updateCartQuantity}
       />
 
-      {/* Quiet Minimalist Tokyo Footer */}
       <footer className="border-t border-neutral-200 bg-white/70 mt-16 px-4 md:px-8 py-8 text-neutral-500 text-xs font-mono-nums">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <span className="font-semibold text-neutral-900 font-sans">chillandtough</span>
+            <span className="font-semibold text-neutral-900 font-sans">{BRAND_NAME}</span>
             <span aria-hidden="true">·</span>
             <span>INDEPENDENT PRODUCT CATALOG</span>
             <span aria-hidden="true">·</span>
@@ -316,14 +301,14 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-6">
-            <span>© 2026 chillandtough</span>
+            <span>© {COPYRIGHT_YEAR} {BRAND_NAME}</span>
             <span aria-hidden="true">·</span>
             <button
               onClick={navigateToAdmin}
               className="text-neutral-500 hover:text-neutral-950 underline underline-offset-4 flex items-center gap-1 transition-colors"
             >
               <Lock className="w-3 h-3" />
-              <span>Admin Console (/admin)</span>
+              <span>Admin Console ({ROUTES.ADMIN})</span>
             </button>
           </div>
         </div>

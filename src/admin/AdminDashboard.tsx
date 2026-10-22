@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Product, Category } from '../types/catalog';
 import { catalogApi, ApiStatus } from '../api/client';
 import { ProductEditorModal } from './ProductEditorModal';
+import { ALL_FILTER, CATEGORY_FILTERS, NEXT_PRODUCT_STATUS } from '../constants/catalog';
+import { ADMIN_TABS, AdminTab, EXPORT_FILE_PREFIX, NOTICE_DURATION_MS } from '../constants/admin';
+import { PRODUCTS as DEFAULT_PRODUCTS } from '../data/products';
+import { formatAmount } from '../utils/format';
 import {
   ArrowLeft,
   Plus,
@@ -11,12 +15,8 @@ import {
   Download,
   Upload,
   CheckCircle2,
-  AlertCircle,
   Search,
-  ExternalLink,
-  Layers,
   Terminal,
-  FileCode,
 } from 'lucide-react';
 
 interface AdminDashboardProps {
@@ -27,10 +27,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigatePublic
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
+  const [selectedCategory, setSelectedCategory] = useState<Category>(ALL_FILTER);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'PRODUCTS' | 'VERCEL_SPEC' | 'DATA'>('PRODUCTS');
+  const [activeTab, setActiveTab] = useState<AdminTab>('PRODUCTS');
   const [apiStatus, setApiStatus] = useState<ApiStatus | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [importText, setImportText] = useState('');
@@ -57,7 +57,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigatePublic
 
   const showNotice = (msg: string) => {
     setNotice(msg);
-    setTimeout(() => setNotice(null), 3000);
+    setTimeout(() => setNotice(null), NOTICE_DURATION_MS);
   };
 
   const handleCreateOrUpdate = async (productData: Omit<Product, 'id'>, id?: string) => {
@@ -88,12 +88,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigatePublic
   };
 
   const handleToggleStatus = async (product: Product) => {
-    const nextStatus: 'ARCHIVE' | 'RELEASED' | 'LOTTERY CLOSED' =
-      product.status === 'ARCHIVE'
-        ? 'RELEASED'
-        : product.status === 'RELEASED'
-        ? 'LOTTERY CLOSED'
-        : 'ARCHIVE';
+    const nextStatus = NEXT_PRODUCT_STATUS[product.status];
 
     try {
       await catalogApi.updateProduct(product.id, { status: nextStatus });
@@ -105,9 +100,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigatePublic
   };
 
   const handleReset = async () => {
-    if (window.confirm('Reset catalog to the factory initial 8 Tokyo streetwear items?')) {
+    if (window.confirm(`Reset catalog to the factory initial ${DEFAULT_PRODUCTS.length} Tokyo streetwear items?`)) {
       await catalogApi.resetCatalog();
-      showNotice('Catalog reset to initial 8 items');
+      showNotice(`Catalog reset to initial ${DEFAULT_PRODUCTS.length} items`);
       await loadData();
     }
   };
@@ -118,7 +113,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigatePublic
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `chillandtough_catalog_${Date.now()}.json`;
+    a.download = `${EXPORT_FILE_PREFIX}${Date.now()}.json`;
     a.click();
     showNotice('Exported catalog JSON file');
   };
@@ -137,7 +132,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigatePublic
 
   // Filter products for admin view
   const filteredProducts = products.filter((p) => {
-    if (selectedCategory !== 'ALL' && p.category !== selectedCategory) return false;
+    if (selectedCategory !== ALL_FILTER && p.category !== selectedCategory) return false;
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
       return (
@@ -199,36 +194,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigatePublic
       <div className="bg-white border-b border-neutral-200 px-4 md:px-8">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <nav className="flex items-center gap-6 text-xs font-mono-nums">
-            <button
-              onClick={() => setActiveTab('PRODUCTS')}
-              className={`py-3 border-b-2 transition-colors ${
-                activeTab === 'PRODUCTS'
-                  ? 'border-neutral-950 text-neutral-950 font-semibold'
-                  : 'border-transparent text-neutral-500 hover:text-neutral-950'
-              }`}
-            >
-              CATALOG ITEMS ({products.length})
-            </button>
-            <button
-              onClick={() => setActiveTab('VERCEL_SPEC')}
-              className={`py-3 border-b-2 transition-colors ${
-                activeTab === 'VERCEL_SPEC'
-                  ? 'border-neutral-950 text-neutral-950 font-semibold'
-                  : 'border-transparent text-neutral-500 hover:text-neutral-950'
-              }`}
-            >
-              VERCEL & PYTHON SPEC
-            </button>
-            <button
-              onClick={() => setActiveTab('DATA')}
-              className={`py-3 border-b-2 transition-colors ${
-                activeTab === 'DATA'
-                  ? 'border-neutral-950 text-neutral-950 font-semibold'
-                  : 'border-transparent text-neutral-500 hover:text-neutral-950'
-              }`}
-            >
-              BACKUP & IMPORT
-            </button>
+            {ADMIN_TABS.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`py-3 border-b-2 transition-colors ${
+                  activeTab === tab.id
+                    ? 'border-neutral-950 text-neutral-950 font-semibold'
+                    : 'border-transparent text-neutral-500 hover:text-neutral-950'
+                }`}
+              >
+                {tab.showCount ? `${tab.label} (${products.length})` : tab.label}
+              </button>
+            ))}
           </nav>
 
           {notice && (
@@ -274,7 +252,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigatePublic
                   TOTAL CATALOG VALUE (JPY)
                 </span>
                 <span className="text-2xl font-bold font-mono-nums text-neutral-950">
-                  ¥{totalValuationJpy.toLocaleString('ja-JP')}
+                  {formatAmount(totalValuationJpy, 'JPY')}
                 </span>
                 <span className="text-[11px] text-neutral-500 block mt-1">
                   Combined retail list
@@ -298,7 +276,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigatePublic
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 border border-neutral-200">
               {/* Category tabs */}
               <div className="flex flex-wrap items-center gap-1">
-                {['ALL', 'OUTERWEAR', 'TOPS', 'BOTTOMS', 'GOODS'].map((cat) => (
+                {CATEGORY_FILTERS.map((cat) => (
                   <button
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
@@ -390,7 +368,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigatePublic
 
                       {/* Price */}
                       <td className="py-3 px-4 font-semibold text-neutral-950">
-                        ¥{p.priceJpy.toLocaleString('ja-JP')}
+                        {formatAmount(p.priceJpy, 'JPY')}
                       </td>
 
                       {/* Status toggle button */}
@@ -580,7 +558,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigatePublic
                 </h3>
               </div>
               <p className="text-xs text-neutral-600">
-                Revert all additions and edits back to the factory set of 8 authentic Tokyo streetwear pieces.
+                Revert all additions and edits back to the factory set of {DEFAULT_PRODUCTS.length} authentic Tokyo streetwear pieces.
               </p>
               <button
                 onClick={handleReset}

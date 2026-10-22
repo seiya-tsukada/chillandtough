@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { CartItem, Product } from '../types/catalog';
+import { CartItem, Currency, Product } from '../types/catalog';
+import { formatAmount, formatAmountWithTax, getUnitPrice } from '../utils/format';
 import { X, Minus, Plus } from 'lucide-react';
 
 interface CartDrawerProps {
@@ -7,7 +8,7 @@ interface CartDrawerProps {
   onClose: () => void;
   items: CartItem[];
   products: Product[];
-  currency: 'JPY' | 'USD';
+  currency: Currency;
   onUpdateQuantity: (productId: string, size: string, quantity: number) => void;
 }
 
@@ -30,10 +31,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
   if (!isOpen) return null;
 
-  const formatPrice = (product: Product, quantity = 1) =>
-    currency === 'JPY'
-      ? `¥${(product.priceJpy * quantity).toLocaleString('ja-JP')}`
-      : `$${(product.priceUsd * quantity).toLocaleString('en-US')}`;
+  const formatLinePrice = (product: Product, quantity: number) =>
+    formatAmount(getUnitPrice(product, currency) * quantity, currency);
 
   // Skip items whose product was removed from the catalog
   const lines = items
@@ -41,14 +40,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
     .filter((line): line is { item: CartItem; product: Product } => !!line.product);
 
   const subtotal = lines.reduce(
-    (sum, { item, product }) =>
-      sum + (currency === 'JPY' ? product.priceJpy : product.priceUsd) * item.quantity,
+    (sum, { item, product }) => sum + getUnitPrice(product, currency) * item.quantity,
     0
   );
-  const formattedSubtotal =
-    currency === 'JPY'
-      ? `¥${subtotal.toLocaleString('ja-JP')} (税込)`
-      : `$${subtotal.toLocaleString('en-US')}`;
+  const formattedSubtotal = formatAmountWithTax(subtotal, currency);
 
   return (
     <div
@@ -108,7 +103,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     </button>
                   </div>
                   <span className="text-xs font-mono-nums font-semibold">
-                    {formatPrice(product, item.quantity)}
+                    {formatLinePrice(product, item.quantity)}
                   </span>
                 </div>
               </div>

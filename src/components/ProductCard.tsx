@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { Product } from '../types/catalog';
+import { getFallbackImageSrc } from '../utils/image';
 
 interface ProductCardProps {
   product: Product;
-  currency: 'JPY' | 'USD';
   onSelect: (product: Product) => void;
-  columns: 2 | 3 | 4;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({
@@ -15,11 +14,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const [imgSrc, setImgSrc] = useState(product.primaryImage);
   const [imageFailed, setImageFailed] = useState(false);
 
-  // Fallback to /images/ if bundled path fails
   const handleError = () => {
-    if (imgSrc.startsWith('/src/assets/images/')) {
-      const filename = imgSrc.replace('/src/assets/images/', '');
-      setImgSrc(`/images/${filename}`);
+    const fallback = getFallbackImageSrc(imgSrc);
+    if (fallback) {
+      setImgSrc(fallback);
     } else {
       setImageFailed(true);
     }
@@ -39,7 +37,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       }}
       aria-label={product.titleEn}
     >
-      {/* Product Card: Product Image Only */}
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-white border border-neutral-200/90 transition-colors duration-200 group-hover:border-neutral-900">
         {!imageFailed ? (
           <img
