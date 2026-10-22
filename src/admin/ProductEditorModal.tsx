@@ -10,6 +10,7 @@ import {
 import {
   BOTTOMS_MEASUREMENT_COLUMNS,
   MEASUREMENT_COLUMNS,
+  MeasurementField,
   PRODUCT_CATEGORIES,
   PRODUCT_STATUSES,
   RELEASE_SEASONS,
@@ -104,12 +105,12 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
 
   const handleMeasurementChange = (
     index: number,
-    field: keyof SizeMeasurement,
+    field: MeasurementField,
     val: string
   ) => {
     const updated = [...measurements];
     const num = parseFloat(val) || 0;
-    (updated[index] as any)[field] = num;
+    updated[index][field] = num;
     setMeasurements(updated);
   };
 

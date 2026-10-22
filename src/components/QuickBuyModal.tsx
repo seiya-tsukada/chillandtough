@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Currency, QuickBuyItem } from '../types/catalog';
 import { PREFECTURES, QUANTITY_OPTIONS } from '../constants/checkout';
 import { formatAmount as formatCurrencyAmount, getUnitPrice } from '../utils/format';
+import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 import { X, Lock } from 'lucide-react';
 
 interface QuickBuyModalProps {
@@ -28,14 +29,7 @@ export const QuickBuyModal: React.FC<QuickBuyModalProps> = ({ item, onClose, cur
     setQuantity(1);
   }, [item]);
 
-  useEffect(() => {
-    if (!item) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [item, onClose]);
+  useKeyboardShortcuts({ Escape: onClose }, !!item);
 
   if (!item) return null;
   const { product, size } = item;

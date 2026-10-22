@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { CartItem, Currency, Product } from '../types/catalog';
 import { formatAmount, formatAmountWithTax, getUnitPrice } from '../utils/format';
+import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 import { X, Minus, Plus } from 'lucide-react';
 
 interface CartDrawerProps {
@@ -20,14 +21,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   currency,
   onUpdateQuantity,
 }) => {
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+  useKeyboardShortcuts({ Escape: onClose }, isOpen);
 
   if (!isOpen) return null;
 

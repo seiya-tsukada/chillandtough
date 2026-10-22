@@ -6,6 +6,7 @@ import { ALL_FILTER, CATEGORY_FILTERS, NEXT_PRODUCT_STATUS } from '../constants/
 import { ADMIN_TABS, AdminTab, EXPORT_FILE_PREFIX, NOTICE_DURATION_MS } from '../constants/admin';
 import { PRODUCTS as DEFAULT_PRODUCTS } from '../data/products';
 import { formatAmount } from '../utils/format';
+import { getErrorMessage } from '../utils/error';
 import {
   ArrowLeft,
   Plus,
@@ -70,8 +71,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigatePublic
         showNotice(`Created new product: ${productData.code}`);
       }
       await loadData();
-    } catch (err: any) {
-      alert(`Error saving product: ${err.message}`);
+    } catch (err) {
+      alert(`Error saving product: ${getErrorMessage(err)}`);
     }
   };
 
@@ -81,8 +82,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigatePublic
         await catalogApi.deleteProduct(id);
         showNotice(`Deleted: ${code}`);
         await loadData();
-      } catch (err: any) {
-        alert(`Error deleting product: ${err.message}`);
+      } catch (err) {
+        alert(`Error deleting product: ${getErrorMessage(err)}`);
       }
     }
   };
@@ -94,8 +95,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigatePublic
       await catalogApi.updateProduct(product.id, { status: nextStatus });
       showNotice(`${product.code} status changed to ${nextStatus}`);
       await loadData();
-    } catch (err: any) {
-      alert(`Error updating status: ${err.message}`);
+    } catch (err) {
+      alert(`Error updating status: ${getErrorMessage(err)}`);
     }
   };
 
@@ -125,8 +126,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigatePublic
       showNotice('Imported catalog successfully');
       setImportText('');
       loadData();
-    } catch (err: any) {
-      alert(`Import failed: ${err.message}`);
+    } catch (err) {
+      alert(`Import failed: ${getErrorMessage(err)}`);
     }
   };
 

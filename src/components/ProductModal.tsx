@@ -3,6 +3,7 @@ import { Currency, Product } from '../types/catalog';
 import { DEFAULT_SIZES, FREE_SIZE } from '../constants/catalog';
 import { formatAmountWithTax, getUnitPrice } from '../utils/format';
 import { getFallbackImageSrc } from '../utils/image';
+import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface ProductModalProps {
@@ -36,16 +37,11 @@ export const ProductModal: React.FC<ProductModalProps> = ({
     }
   }, [product]);
 
-  // Keyboard navigation & escape listener
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-      if (e.key === 'ArrowLeft') onPrevProduct();
-      if (e.key === 'ArrowRight') onNextProduct();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClose, onPrevProduct, onNextProduct]);
+  useKeyboardShortcuts({
+    Escape: onClose,
+    ArrowLeft: onPrevProduct,
+    ArrowRight: onNextProduct,
+  });
 
   if (!product) return null;
 

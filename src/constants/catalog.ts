@@ -43,7 +43,7 @@ export const GRID_OPTIONS: { columns: GridColumns; title: string; ariaLabel: str
   { columns: 4, title: '4 Columns (Dense)', ariaLabel: '4 columns view' },
 ];
 
-type MeasurementField = Exclude<keyof SizeMeasurement, 'size'>;
+export type MeasurementField = Exclude<keyof SizeMeasurement, 'size'>;
 
 /** Editable measurement columns (cm). BOTTOMS additionally use BOTTOMS_MEASUREMENT_COLUMNS. */
 export const MEASUREMENT_COLUMNS: { field: MeasurementField; label: string }[] = [

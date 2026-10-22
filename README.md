@@ -32,6 +32,7 @@ http://localhost:3000 で起動します。管理画面は `/admin` です。
 ```
 api/                Python FastAPI (Vercel Serverless)
   index.py          エンドポイント定義
+  constants.py      API の定数
   data.py           初期カタログデータ
 public/images/      商品画像
 src/
@@ -40,6 +41,7 @@ src/
   components/       公開カタログの UI コンポーネント
   constants/        定数 (カテゴリ・通貨・ストレージキー・API パス等)
   data/             初期商品データ・ルックブック定義
+  hooks/            カスタムフック
   types/            型定義
   utils/            フォーマット等のユーティリティ
 ```
